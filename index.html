@@ -1,0 +1,296 @@
+
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>GLUS</title>
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta property="og:image" content="">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1711">
+    <meta property="og:image:height" content="576">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://glus-video.github.io/"/>
+    <meta property="og:title" content="GLUS: Global-Local Reasoning Unified into A Single Large Language Model for Video Segmentation" />
+    <meta property="og:description" content="This paper proposes a novel framework utilizing multi-modal large language models (MLLMs) for referring video object segmentation (RefVOS). 
+    Previous MLLM-based methods commonly struggle with the dilemma between 'Ref' and 'VOS': they either specialize in understanding a few key frames (global reasoning) or tracking objects on continuous frames (local reasoning), and rely on external VOS or frame selectors to mitigate the other end of the challenge. 
+    However, our framework <b>GLUS</b> shows that <b>G</b>lobal and <b>L</b>ocal consistency can be <b>U</b>nified into a single video <b>S</b>egmentation MLLM: a set of sparse 'context frames' provides global information, while a stream of continuous 'query frames' conducts local object tracking. 
+    This is further supported by jointly training the MLLM with a pre-trained VOS memory bank to simultaneously digest short-range and long-range temporal information. 
+    To improve the information efficiency within the limited context window of MLLMs, we introduce object contrastive learning to distinguish hard false-positive objects and a self-refined framework to identify crucial frames and perform propagation. 
+    By collectively integrating these insights, our <b>GLUS</b> delivers a simple yet effective baseline, achieving new state-of-the-art for MLLMs on the MeViS and Ref-Youtube-VOS benchmark. "/>
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GLUS: Global-Local Reasoning Unified into A Single Large Language Model for Video Segmentation" />
+    <meta name="twitter:description" content="Global-Local Reasoning Unified into A Single Large Language Model for Video Segmentation"/>
+    <meta name="twitter:image" content="" />
+
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22></text></svg>">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.8.0/codemirror.min.css">
+    <link rel="stylesheet" href="css/app.css">
+	<link rel="stylesheet" href="css/fontawesome.all.min.css">
+	<link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+	<script defer src="js/fontawesome.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+    <script src="js/app.js"></script>
+    <script src="js/synced_video_selector.js"></script>
+
+</head>
+
+<body style="padding: 1%; width: 100%">
+    <div class="container-lg text-center" style="max-width: 1500px; margin: auto;" id="main">
+    <!-- <div class="container" id="main"> -->
+        <div class="row">
+            <h1 class="col-md-12 text-center">
+                <b>GLUS</b>: Global-Local Reasoning Unified into A Single Large Language Model for Video Segmentation</br> 
+            </h1>
+        </div>
+        <div class="row text-center">
+<div class="col-md-3">
+    </div>
+            <div class="col-md-6 text-center">
+                <ul class="list-inline">
+                    <li>
+                        <a href="https://openreview.net/profile?id=~Lang_Lin3">
+                            Lang Lin
+                        </a><sup>1</sup>*
+                    </li>
+                    <li>
+                      <a href="https://openreview.net/profile?id=~Xueyang_Yu1">
+                          Xueyang Yu
+                      </a><sup>2</sup>*
+                  </li>
+                    <li>
+                      <a href="https://ziqipang.github.io/">
+                          Ziqi Pang
+                      </a><sup>3</sup>*
+                  </li>
+                    <li>
+                        <a href="https://yxw.cs.illinois.edu/">
+                            Yu-Xiong Wang
+                        </a><sup>3</sup>
+                </ul>
+            </div>
+<div class="col-md-3">
+    </div>
+            <div class="col-md-12 text-center">
+                <!-- <sup>1</sup>University of Illinois Urbana-Champaign, &nbsp <sup>2</sup>Massachusetts Institute of Technology, &nbsp <sup>3</sup>Adobe Research &nbsp; &nbsp; <br>* Equal Contribution -->
+                <sup>1</sup>Nanjing University, &nbsp <sup>2</sup>ShanghaiTech University, &nbsp <sup>3</sup>University of Illinois Urbana-Champaign; &nbsp; <br>* Equal Contribution
+
+            </div>
+<br>
+        <div class="row text-center">
+					
+			     <span class="link-block">
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                  </span>
+                  <span>arXiv (Coming Soon)</span>
+                </a>
+                <a href=""
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code (Coming Soon)</span>
+                </a>
+              </span>
+			</div>
+
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <h2>
+                        TL;DR
+                    </h2>
+                    <p class="text-justify">
+                        We propose <b>GLUS</b>, unify the distinct challenges of <b>Referring Video Object Segmentation</b>, "ref" and "vos," into a simple framework for MLLMs.
+                    </p>
+                </div>
+            </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <img id="teaser" width="98%" src="img/teaserfig.png">
+			</div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h2>
+                    Abstract
+                </h2>
+                <p class="text-justify">
+                  This paper proposes a novel framework utilizing multi-modal large language models (MLLMs) for referring video object segmentation (RefVOS). 
+                  Previous MLLM-based methods commonly struggle with the dilemma between 'Ref' and 'VOS': they either specialize in understanding a few key frames (global reasoning) or tracking objects on continuous frames (local reasoning), and rely on external VOS or frame selectors to mitigate the other end of the challenge. 
+                  However, our framework <b>GLUS</b> shows that <b>G</b>lobal and <b>L</b>ocal consistency can be <b>U</b>nified into a single video <b>S</b>egmentation MLLM: a set of sparse 'context frames' provides global information, while a stream of continuous 'query frames' conducts local object tracking. 
+                  This is further supported by jointly training the MLLM with a pre-trained VOS memory bank to simultaneously digest short-range and long-range temporal information. 
+                  To improve the information efficiency within the limited context window of MLLMs, we introduce object contrastive learning to distinguish hard false-positive objects and a self-refined framework to identify crucial frames and perform propagation. 
+                  By collectively integrating these insights, our <b>GLUS</b> delivers a simple yet effective baseline, achieving new state-of-the-art for MLLMs on the MeViS and Ref-Youtube-VOS benchmark.
+                </p>
+            </div>
+        </div>
+        <br>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+            <h2> <font color="#118ab2">GLUS</font>: Global-Local Unified Reasoning Framework for MLLMs </h2>
+            <img id="glus_framework" width="98%" src="img/pipeline.png">
+
+            <p class="text-justify">
+                
+            </p>
+                    <!-- <video id="raster" style='border: 2px solid #D9D9D9;' width="60%" muted controls>
+                      <source src="videos/raster_order.mp4" type="video/mp4" />
+                    </video> -->
+            <h3> Global-Local Reasoning</h3>
+            <h3> End-to-End Memory bank</h3>
+            <h3> Object Contrastive Loss</h3>
+            <h3> Self-Refined Selection and Propagation</h3>
+                </div>
+            </div>
+        <br><br>
+        
+
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2">
+          <h2> Qualitative Results </h2>
+              </div>
+          </div>
+      <br><br>
+      
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+          <h3> Elephant Crushed by another elephant's trunk </h3>
+              </div>
+          </div>
+        <div class="col-md-4">
+          <h4> Ground Truth </h4>
+          <video autoplay muted loop playsinline width="100%">
+            <source src="videos/sample1_gt.mp4" type="video/mp4"/>
+          </video>
+        </div>
+        <div class="col-md-4">
+          <h4> Baseline </h4>
+          <video autoplay muted loop playsinline width="100%">
+            <source src="videos/sample1_dshmp.mp4" type="video/mp4"/>
+          </video>
+        </div>
+        <div class="col-md-4">
+          <h4> GLUS </h4>
+          <video autoplay muted loop playsinline width="100%">
+            <source src="videos/sample1_glus.mp4" type="video/mp4"/>
+          </video>
+        </div>
+
+        <div class="col-md-8 col-md-offset-2">
+            <h3> Elephant Crushed by another elephant's trunk </h3>
+                </div>
+            </div>
+          <div class="col-md-4">
+            <h4> Ground Truth </h4>
+            <video autoplay muted loop playsinline width="100%">
+              <source src="videos/sample1_gt.mp4" type="video/mp4"/>
+            </video>
+          </div>
+          <div class="col-md-4">
+            <h4> Baseline </h4>
+            <video autoplay muted loop playsinline width="100%">
+              <source src="videos/sample1_dshmp.mp4" type="video/mp4"/>
+            </video>
+          </div>
+          <div class="col-md-4">
+            <h4> GLUS </h4>
+            <video autoplay muted loop playsinline width="100%">
+              <source src="videos/sample1_glus.mp4" type="video/mp4"/>
+            </video>
+          </div>
+
+          <div class="col-md-8 col-md-offset-2">
+            <h3> Elephant Crushed by another elephant's trunk </h3>
+                </div>
+            </div>
+          <div class="col-md-4">
+            <h4> Ground Truth </h4>
+            <video autoplay muted loop playsinline width="100%">
+              <source src="videos/sample1_gt.mp4" type="video/mp4"/>
+            </video>
+          </div>
+          <div class="col-md-4">
+            <h4> Baseline </h4>
+            <video autoplay muted loop playsinline width="100%">
+              <source src="videos/sample1_dshmp.mp4" type="video/mp4"/>
+            </video>
+          </div>
+          <div class="col-md-4">
+            <h4> GLUS </h4>
+            <video autoplay muted loop playsinline width="100%">
+              <source src="videos/sample1_glus.mp4" type="video/mp4"/>
+            </video>
+          </div>
+
+          
+      </div>
+      <br><br>
+
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                <h2> Conclusions  </h2>
+                <p class="text-justify">
+                  We introduce a simple yet effective framework based on multimodal large language models (MLLM) for referring video object segmentation (RefVOS). 
+                  Named <b>GLUS</b>, our method establishes unified global and local reasoning in a single LLM, addressing the distinct 'Ref' and 'VOS' challenges of RefVOS. 
+                  The central design is to provide MLLM with both global (<i>context frames</i>) and local (<i>query frames</i>) contexts. 
+                  Such unified global-local reasoning is further enhanced with end-to-end optimization with VOS memory modules, which improves the consistency of <b>GLUS</b>. 
+                  Finally, <b>GLUS</b> introduces plug-and-play <i>object contrastive loss</i> and <i>pseudo-labeling</i> for key frame selection, enabling the MLLM to distinguish the correct object and frame with its limited context window. 
+                  Our <b>GLUS</b> establishes the new state of the arts on RefVOS benchmarks. We hope our baseline can inspire more systematic studies enabling MLLMs to fine-grained video understanding.
+                </p>
+                   
+                </div>
+                </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Citation
+                </h3>
+                <div class="form-group col-md-10 col-md-offset-1">
+				  <p class="text-justify" style="background-color:#D9D9D9;">
+                    <textarea id="bibtex" class="form-control" style="background-color:#D9D9D9;" readonly>
+@article{glus2024,
+    title={GLUS: Global-Local Reasoning Unified into A Single Large Language Model for Video Segmentation},
+    author={Lin, Lang and Yu, Xueyang and Pang, Ziqi and Wang, Yu-Xiong},
+    journal={arXiv},
+    year={2024}
+}</textarea></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <h3>
+                    Acknowledgements
+                </h3>
+                <p class="text-justify">
+                    <br><br>
+                The website template was borrowed from <a href="http://mgharbi.com/">Michaël Gharbi</a>, <a href="https://dorverbin.github.io/refnerf">Ref-NeRF</a>, and <a href="https://reconfusion.github.io/">ReconFusion</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
