@@ -12,8 +12,3 @@
     <a href="https://yxw.web.illinois.edu/">Yu-Xiong Wang</a>
   </p>
 </div>
-
-
-**News**
-
-## TODO
